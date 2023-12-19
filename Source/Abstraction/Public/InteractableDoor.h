@@ -15,6 +15,7 @@ class ABSTRACTION_API AInteractableDoor : public AStaticMeshActor
 
 public:
 	AInteractableDoor();
+	float InteractionTime = 5.0f;
 
 protected:
 	UPROPERTY(EditAnywhere, NoClear)
