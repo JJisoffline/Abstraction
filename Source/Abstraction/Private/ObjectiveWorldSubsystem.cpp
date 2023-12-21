@@ -3,20 +3,65 @@
 
 #include "ObjectiveWorldSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "../AbstractionGameModeBase.h"
+#include "Blueprint/UserWidget.h"
+#include "ObjectiveHud.h"
 
-void UObjectiveWorldSubsystem::CreateObjectiveWidget(TSubclassOf<UUserWidget> ObjectiveWidgetClass)
+void UObjectiveWorldSubsystem::Deinitialize()
+{
+	ObjectiveWidget = nullptr;
+	ObjectivesCompleteWidget = nullptr;
+}
+
+void UObjectiveWorldSubsystem::CreateObjectiveWidgets()
 {
 	if (ObjectiveWidget == nullptr)
 	{
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		ObjectiveWidget = CreateWidget<UUserWidget>(PlayerController, ObjectiveWidgetClass);
+		AAbstractionGameModeBase* GameMode = Cast<AAbstractionGameModeBase>(GetWorld()->GetAuthGameMode());
+		if (GameMode)
+		{
+			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+			ObjectiveWidget = CreateWidget<UObjectiveHud>(PlayerController, GameMode->ObjectiveWidgetClass);
+			ObjectivesCompleteWidget = CreateWidget<UUserWidget>(PlayerController, GameMode->ObjectivesCompleteWidgetClass);
+		}
 	}
 }
 
 void UObjectiveWorldSubsystem::DisplayObjectiveWidget()
 {
-	ensureMsgf(ObjectiveWidget, TEXT("UObjectiveWorldSubsystem::DisplayObjectiveWidget ObjectiveWidget is nullptr"));
-	ObjectiveWidget->AddToViewport();
+	if (ObjectiveWidget)
+	{
+		if(!ObjectiveWidget->IsInViewport());
+		{
+			ObjectiveWidget->AddToViewport();
+		}
+		ObjectiveWidget->UpdateObjectiveText(GetCompletedObjectiveCount(), Objectives.Num());
+	}
+}
+
+void UObjectiveWorldSubsystem::RemoveObjectiveWidget()
+{
+	if (ObjectiveWidget)
+	{
+		ObjectiveWidget->RemoveFromViewport();
+	}
+}
+
+void UObjectiveWorldSubsystem::DisplayObjectivesCompleteWidget()
+{
+	if (ObjectivesCompleteWidget)
+	{
+		ObjectivesCompleteWidget->AddToViewport();
+	}
+}
+
+
+void UObjectiveWorldSubsystem::RemoveObjectivesCompleteWidget()
+{
+	if (ObjectivesCompleteWidget)
+	{
+		ObjectivesCompleteWidget->RemoveFromViewport();
+	}
 }
 
 FString UObjectiveWorldSubsystem::GetCurrentObjectiveDescription()
@@ -49,10 +94,51 @@ void UObjectiveWorldSubsystem::AddObjective(UObjectiveComponent* ObjectiveCompon
 
 void UObjectiveWorldSubsystem::RemoveObjective(UObjectiveComponent* ObjectiveComponent)
 {
+	int32 numRemoved = ObjectiveComponent->OnStateChanged().RemoveAll(this);
+	check(numRemoved);
 	Objectives.Remove(ObjectiveComponent);
+}
+
+uint32 UObjectiveWorldSubsystem::GetCompletedObjectiveCount()
+{
+	uint32 ObjectivedWorld = 0u;
+	for (const UObjectiveComponent* OC : Objectives)
+	{
+		if (OC && OC->GetState() == EObjectiveState::OS_Completed)
+		{
+			++ObjectivedCompleted:
+		}
+	}
+
+	return ObjectivedCompleted;
+}
+
+void UObjectiveWorldSubsystem::OnMapStart()
+{
+	AAbstractionGameModeBase* GameMode = Cast<AAbstractionGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GameMode)
+	{
+		CreateObjectiveWidgets();
+		DisplayObjectiveWidget();
+	}
 }
 
 void UObjectiveWorldSubsystem::OnObjectiveStateChanged(UObjectiveComponent* ObjectiveComponent, EObjectiveState ObjectiveState)
 {
-	DisplayObjectiveWidget();
+	if (Objectives.Num() == 0 || !Objectives.Contains(ObjectiveComponent))
+	{
+		return;
+	}
+	
+	if (ObjectiveWidget && ObjectivesCompleteWidget)
+	{
+		if ((ObjectiveState == EObjectiveState::OS_Completed) && GetCompletedObjectiveCount() == Objectives.Num())
+		{
+			DisplayObjectivesCompleteWidget();
+		}
+		//else
+		//{
+			DisplayObjectiveWidget();
+		//}
+	}
 }

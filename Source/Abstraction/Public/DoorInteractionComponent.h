@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Curves/CurveFloat.h"
+#include "InteractionComponent.h"
 #include "DoorInteractionComponent.generated.h"
 
 class ATriggerBox;
@@ -20,7 +21,7 @@ enum class EDoorState
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class ABSTRACTION_API UDoorInteractionComponent : public UActorComponent
+class ABSTRACTION_API UDoorInteractionComponent : public UInteractionComponent
 {
 	GENERATED_BODY()
 
@@ -39,6 +40,16 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	void InteractionStart() override;
+
+	UFUNCTION(BluePrintCallable)
+	void OpenDoor();
+
+	void OnDoorOpen();
+
+	UFUNCTION(BluePrintCallable)
+	bool IsOpen() { return DoorState == EDoorState::DS_Open; }
 	
 	UPROPERTY(EditAnywhere)
 	FRotator DesiredRotation = FRotator::ZeroRotator;
@@ -64,8 +75,5 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	void OnDoorOpen();
-
 
 };

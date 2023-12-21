@@ -3,13 +3,15 @@
 
 #include "ObjectiveComponent.h"
 #include "ObjectiveWorldSubsystem.h"
+#include "Engine/World.h"
 
 // Sets default values for this component's properties
 UObjectiveComponent::UObjectiveComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	bWantsInitializeComponent = true;
+	PrimaryComponentTick.bCanEverTick = false;
 	State = EObjectiveState::OS_Inactive;
 
 	// ...
@@ -26,9 +28,8 @@ void UObjectiveComponent::SetState(EObjectiveState NewState)
 
 
 // Called when the game starts
-void UObjectiveComponent::BeginPlay()
+void UObjectiveComponent::InitializeComponent()
 {
-	Super::BeginPlay();
 
 	// register
 	UObjectiveWorldSubsystem* ObjectiveWorldSubsystem = GetWorld()->GetSubsystem<UObjectiveWorldSubsystem>();

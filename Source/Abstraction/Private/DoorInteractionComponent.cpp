@@ -4,7 +4,6 @@
 #include "DoorInteractionComponent.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/PlayerController.h"
-#include "Engine/TriggerBox.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
 #include "DrawDebugHelpers.h"
@@ -29,6 +28,14 @@ UDoorInteractionComponent::UDoorInteractionComponent()
 	CVarToggleDebugDoor.AsVariable()->SetOnChangedCallback(FConsoleVariableDelegate::CreateStatic(&UDoorInteractionComponent::OnDebugToggled));
 }
 
+void UDoorInteractionComponent::InteractionStart()
+{
+	Super::InteractionStart();
+	if (InteractingActor)
+	{
+		OpenDoor();
+	}
+}
 
 // Called when the game starts
 void UDoorInteractionComponent::BeginPlay()
@@ -40,25 +47,24 @@ void UDoorInteractionComponent::BeginPlay()
 
 }
 
+void UDoorInteractionComponent::OpenDoor()
+{
+	if (IsOpen() || DoorState == EDoorState::DS_Opening)
+	{
+		return;
+	}
+
+	DoorState = EDoorState::DS_Opening;
+	CurrentRotationTime = 0.0f;
+}
+
 
 // Called every frame
 void UDoorInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (DoorState == EDoorState::DS_Closed)
-	{
-		if (TriggerBox && GetWorld() && GetWorld()->GetFirstLocalPlayerFromController())
-		{
-			APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
-			if (PlayerPawn && TriggerBox->IsOverlappingActor(PlayerPawn))
-			{
-				DoorState = EDoorState::DS_Opening;
-				CurrentRotationTime = 0.0f;
-			}
-		}
-	}
-	else if (DoorState == EDoorState::DS_Opening)
+	if (DoorState == EDoorState::DS_Opening)
 	{
 		CurrentRotationTime += DeltaTime;
 		const float TimeRatio = FMath::Clamp(CurrentRotationTime / TimeToRotate, 0.0f, 1.0f);
@@ -83,6 +89,8 @@ void UDoorInteractionComponent::OnDoorOpen()
 		ObjectiveComponent->SetState(EObjectiveState::OS_Completed);
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("DoorOpened"));
+
+	InteractionSuccess.Broadcast();
 }
 
 void UDoorInteractionComponent::OnDebugToggled(IConsoleVariable* Var)
