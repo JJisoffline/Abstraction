@@ -31,7 +31,7 @@ void UObjectiveWorldSubsystem::DisplayObjectiveWidget()
 {
 	if (ObjectiveWidget)
 	{
-		if(!ObjectiveWidget->IsInViewport());
+		if(!ObjectiveWidget->IsInViewport())
 		{
 			ObjectiveWidget->AddToViewport();
 		}
@@ -101,12 +101,12 @@ void UObjectiveWorldSubsystem::RemoveObjective(UObjectiveComponent* ObjectiveCom
 
 uint32 UObjectiveWorldSubsystem::GetCompletedObjectiveCount()
 {
-	uint32 ObjectivedWorld = 0u;
+	uint32 ObjectivedCompleted = 0u;
 	for (const UObjectiveComponent* OC : Objectives)
 	{
 		if (OC && OC->GetState() == EObjectiveState::OS_Completed)
 		{
-			++ObjectivedCompleted:
+			++ObjectivedCompleted;
 		}
 	}
 

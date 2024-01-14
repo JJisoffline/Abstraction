@@ -27,7 +27,6 @@ void UObjectiveComponent::SetState(EObjectiveState NewState)
 }
 
 
-// Called when the game starts
 void UObjectiveComponent::InitializeComponent()
 {
 
@@ -38,6 +37,19 @@ void UObjectiveComponent::InitializeComponent()
 		ObjectiveWorldSubsystem->AddObjective(this);
 	}
 	
+}
+
+void UObjectiveComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//register
+	UObjectiveWorldSubsystem* ObjectiveWorldSubsystem = GetWorld()->GetSubsystem<UObjectiveWorldSubsystem>();
+	if (ObjectiveWorldSubsystem)
+	{
+		ObjectiveWorldSubsystem->AddObjective(this);
+	}
+
 }
 
 void UObjectiveComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

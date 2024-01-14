@@ -28,7 +28,7 @@ UInteractionComponent::UInteractionComponent()
 	InteractingActor = nullptr;
 }
 
-void UInteractionComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void UInteractionComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("UInteractiveComponent::OnOverlapBegin"));
 
@@ -38,7 +38,7 @@ void UInteractionComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, 
 	}
 }
 
-void UInteractionComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void UInteractionComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	UE_LOG(LogTemp, Warning, TEXT("UInteractiveComponent::OnOverlapEnd"));
 	InteractingActor = nullptr;

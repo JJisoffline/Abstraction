@@ -25,8 +25,8 @@ public:
 
 	UCapsuleComponent* GetTriggerCapsule() const { return TriggerCapsule; }
 
-	bool IsActive() const { return bActive; }
-	void SetActive(bool IsActive) { bActive = IsActive; }
+	bool IsEnabled() const { return bEnabled; }
+	void SetEnabled(bool bIsEnabled) { bEnabled = bIsEnabled; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -43,5 +43,5 @@ protected:
 	UPROPERTY(EditAnywhere, NoClear)
 	UCapsuleComponent* TriggerCapsule;
 
-	bool bActive = true;
+	bool bEnabled = true;
 };

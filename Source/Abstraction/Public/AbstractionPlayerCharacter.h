@@ -7,6 +7,7 @@
 #include "AbstractionPlayerCharacter.generated.h"
 
 class UHealthComponent;
+class UDamageHandlerComponent;
 class UParticleSystemComponent;
 
 DECLARE_MULTICAST_DELEGATE(FOnInteractionStart);
@@ -23,6 +24,12 @@ public:
 
 	AAbstractionPlayerCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	UPROPERTY(EditAnywhere)
+	UParticleSystemComponent* ParticleSystemComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UDamageHandlerComponent* DamageHandlerComponent;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -31,9 +38,6 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UHealthComponent* HealthComponent;
-
-	UPROPERTY(EditAnywhere)
-	UParticleSystemComponent* ParticleSystemComponent;
 
 	void StartInteraction();
 	void StopInteraction();
@@ -50,7 +54,7 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-	void SetOnFire(UParticleSystemComponent* FireParticleSystemComponent);
+	void SetOnFire(float BaseDamage, float DamageTotalTime, float TakeDamageInterval);
 
 	FOnInteractionStart FOnInteractionStart;
 	FOnInteractionCancel FOnInteractionCancel;

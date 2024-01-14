@@ -69,7 +69,7 @@ void UDamageHandlerComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		{
 			if (PlayerCharacter->ParticleSystemComponent)
 			{
-				PlayerCharacter->ParticleSystemComponent->Deactive();
+				PlayerCharacter->ParticleSystemComponent->Deactivate();
 				PlayerCharacter->ParticleSystemComponent->SetTemplate(nullptr);
 			}
 			ActiveDamageInfo.Reset();
