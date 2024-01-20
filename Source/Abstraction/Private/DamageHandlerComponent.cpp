@@ -65,26 +65,30 @@ void UDamageHandlerComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	if (PlayerCharacter)
 	{
 		FScopeLock Lock(&CriticalSection);
-		if (ActiveDamageInfo.IsSet())
+		if (ActiveDamageInfo.IsSet()) // only when this is set, should we access it within this if statement
 		{
-			if (PlayerCharacter->ParticleSystemComponent)
+			// the if/else you are looking for is based on the accumulated time vs life time, while we have not reached life time, accumulate and apply damage in the else.
+			if (ActiveDamageInfo.GetValue().AccumulatedTime > ActiveDamageInfo.GetValue().LifeTime)
 			{
-				PlayerCharacter->ParticleSystemComponent->Deactivate();
-				PlayerCharacter->ParticleSystemComponent->SetTemplate(nullptr);
+				if (PlayerCharacter->ParticleSystemComponent)
+				{
+					PlayerCharacter->ParticleSystemComponent->Deactivate();
+					PlayerCharacter->ParticleSystemComponent->SetTemplate(nullptr);
+				}
+				ActiveDamageInfo.Reset();
 			}
-			ActiveDamageInfo.Reset();
-		}
-		else
-		{
-			ActiveDamageInfo.GetValue().AccumulatedTime += DeltaTime;
-			ActiveDamageInfo.GetValue().CurrentTimeInterval += DeltaTime;
-			if (ActiveDamageInfo.GetValue().CurrentTimeInterval > ActiveDamageInfo.GetValue().IntervalTime)
+			else
 			{
-				float ModifiedDamage = ActiveDamageInfo.GetValue().BaseDamage / (ActiveDamageInfo.GetValue().LifeTime / ActiveDamageInfo.GetValue().IntervalTime);
-				TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
-				FDamageEvent DamageEvent(ValidDamageTypeClass);
-				PlayerCharacter->TakeDamage(ModifiedDamage, DamageEvent, nullptr, GetOwner());
-				ActiveDamageInfo.GetValue().CurrentTimeInterval = 0.0f;
+				ActiveDamageInfo.GetValue().AccumulatedTime += DeltaTime;
+				ActiveDamageInfo.GetValue().CurrentTimeInterval += DeltaTime;
+				if (ActiveDamageInfo.GetValue().CurrentTimeInterval > ActiveDamageInfo.GetValue().IntervalTime)
+				{
+					float ModifiedDamage = ActiveDamageInfo.GetValue().BaseDamage / (ActiveDamageInfo.GetValue().LifeTime / ActiveDamageInfo.GetValue().IntervalTime);
+					TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
+					FDamageEvent DamageEvent(ValidDamageTypeClass);
+					PlayerCharacter->TakeDamage(ModifiedDamage, DamageEvent, nullptr, GetOwner());
+					ActiveDamageInfo.GetValue().CurrentTimeInterval = 0.0f;
+				}
 			}
 		}
 	}

@@ -63,7 +63,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		FVector Offset(0.0f, 0.0f, 100.0f);
 		FVector StartLocation = GetOwner()->GetActorLocation() + Offset;
-		DrawDebugString(GetWorld(), Offset, InteractionPrompt.ToString(), GetOwner(), FColor::Blue, 0.0f);
+		DrawDebugString(GetWorld(), Offset, InteractionPrompt.ToString(), GetOwner(), FColor::Blue, DeltaTime);
 	}
 }
 

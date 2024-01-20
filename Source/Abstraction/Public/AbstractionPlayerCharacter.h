@@ -30,17 +30,31 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UDamageHandlerComponent* DamageHandlerComponent;
 
+	UFUNCTION(BlueprintCallable)
+	const bool IsAlive() const;
+
+	UFUNCTION(BlueprintCallable)
+	const float GetCurrentHealth() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void OnDeath(bool IsFellOut);
 
+	UFUNCTION()
+	void OnDeathTimerFinished();
+
 	UPROPERTY(EditAnywhere)
 	UHealthComponent* HealthComponent;
 
 	void StartInteraction();
 	void StopInteraction();
+
+	UPROPERTY(EditAnywhere)
+	float TimeRestartLevelAfterDeath = 2.0f;
+
+	FTimerHandle RestartLevelTimerHandle;
 
 public:	
 	// Called every frame
