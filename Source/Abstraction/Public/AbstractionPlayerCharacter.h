@@ -56,6 +56,17 @@ protected:
 
 	FTimerHandle RestartLevelTimerHandle;
 
+	APlayerController* PC;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	TSubclassOf<UCameraShakeBase> CamShake;
+
+	//force feedback values
+	UPROPERTY(EditAnywhere, Category = "Force Feedback")
+	float ForceFeedBackIntensity = 1.0f;
+	UPROPERTY(EditAnywhere, Category = "Force Feedback")
+	float ForceFeedBackDuration = 1.0f;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -69,6 +80,15 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	void SetOnFire(float BaseDamage, float DamageTotalTime, float TakeDamageInterval);
+
+	UFUNCTION(BlueprintCallable)
+	void HandleItemCollected();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ItemCollected();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int ItemsCollected = 0;
 
 	FOnInteractionStart FOnInteractionStart;
 	FOnInteractionCancel FOnInteractionCancel;
